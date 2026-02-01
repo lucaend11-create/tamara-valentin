@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>💘 Tamara?</title>
+  <style>
+    :root{
+      --bg1:#ff4d6d;
+      --bg2:#ff85a1;
+      --card: rgba(255,255,255,0.92);
+      --text:#1f1f1f;
+      --yes:#22c55e;
+      --no:#ef4444;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: radial-gradient(1200px 800px at 20% 10%, #fff 0%, transparent 60%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      padding: 18px;
+      overflow:hidden;
+    }
+    .card{
+      width:min(560px, 100%);
+      background: var(--card);
+      border-radius: 22px;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.25);
+      overflow:hidden;
+      backdrop-filter: blur(6px);
+      position: relative;
+    }
+    .photo{
+      width:100%;
+      height: 240px;
+      object-fit: cover;
+      display:block;
+      filter: saturate(1.05) contrast(1.02);
+    }
+    .content{
+      padding: 18px 16px 16px;
+      text-align:center;
+    }
+    h1{
+      margin: 6px 0 8px;
+      font-size: clamp(26px, 6vw, 40px);
+      line-height: 1.12;
+      color: var(--text);
+    }
+    .from{
+      margin: 0 0 14px;
+      font-size: 15px;
+      opacity: 0.85;
+    }
+    .buttons{
+      position: relative;
+      height: 124px;
+      margin: 10px auto 10px;
+      width: 100%;
+      max-width: 440px;
+    }
+    button{
+      border:0;
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.15);
+      transition: transform 120ms ease, filter 120ms ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      position:absolute;
+      min-width: 150px;
+    }
+    button:active{ transform: scale(0.96); }
+    #yesBtn{
+      background: linear-gradient(180deg, #34d399, var(--yes));
+      color: white;
+      left: 12%;
+      top: 34px;
+    }
+    #noBtn{
+      background: linear-gradient(180deg, #fb7185, var(--no));
+      color: white;
+      right: 12%;
+      top: 34px;
+    }
+    .hint{
+      margin-top: 10px;
+      font-size: 14px;
+      opacity: 0.82;
+    }
+    .toast{
+      margin: 10px auto 0;
+      max-width: 460px;
+      display:none;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.35);
+      color: #0f5132;
+      padding: 12px 12px;
+      border-radius: 14px;
+      font-weight: 700;
+    }
+    .hearts{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .heart{
+      position:absolute;
+      bottom:-30px;
+      font-size: 22px;
+      opacity: 0;
+      animation: floatUp 2.2s ease-in forwards;
+    }
+    @keyframes floatUp{
+      0% { transform: translateY(0) scale(0.9); opacity:0; }
+      10% { opacity:1; }
+      100% { transform: translateY(-240px) scale(1.15); opacity:0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="hearts" id="hearts"></div>
+
+    <!-- FOTO: Datei im selben Ordner, Name: foto.jpg -->
+    <img class="photo" src="foto.jpg" alt="Unser Foto" />
+
+    <div class="content">
+      <h1>Tamara, willst du mein Valentin sein? 💘</h1>
+      <p class="from">— Luca</p>
+
+      <div class="buttons" id="arena">
+        <button id="yesBtn">Ja 💚</button>
+        <button id="noBtn">Nein 🙈</button>
+      </div>
+
+      <div class="toast" id="toast">
+        Yaaay! 🥰 Ich schreib dir sofort auf WhatsApp 💞
+      </div>
+
+      <div class="hint">Der Nein-Button lässt sich nur schwer fangen 😈</div>
+    </div>
+  </div>
+
+  <script>
+    const arena = document.getElementById('arena');
+    const noBtn = document.getElementById('noBtn');
+    const yesBtn = document.getElementById('yesBtn');
+    const toast = document.getElementById('toast');
+    const hearts = document.getElementById('hearts');
+
+    // ✅ WhatsApp: HIER Nummer eintragen (mit Ländercode, ohne +, ohne Leerzeichen)
+    // Beispiel DE: 491701234567
+    const WHATSAPP_NUMBER = „4917670010184";
+
+    // ✅ Nachricht, die sie bei "Ja" bekommt
+    const WHATSAPP_TEXT =
+      "JAAAA 💚💘 Ich will dein Valentin sein! 😘";
+
+    function openWhatsApp(){
+      const encoded = encodeURIComponent(WHATSAPP_TEXT);
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
+      // Für Handy am zuverlässigsten:
+      window.location.href = url;
+    }
+
+    function placeNoAt(x, y){
+      const a = arena.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
+      const maxX = a.width - b.width;
+      const maxY = a.height - b.height;
+      const nx = Math.max(0, Math.min(x, maxX));
+      const ny = Math.max(0, Math.min(y, maxY));
+      noBtn.style.left = nx + "px";
+      noBtn.style.top  = ny + "px";
+    }
+
+    function init(){
+      noBtn.style.right = "auto";
+      placeNoAt(arena.clientWidth * 0.58, 34);
+    }
+
+    function randomHop(){
+      const a = arena.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
+      const maxX = a.width - b.width;
+      const maxY = a.height - b.height;
+      const x = Math.random() * maxX;
+      const y = Math.random() * maxY;
+      placeNoAt(x, y);
+      noBtn.style.transform = `scale(1.03) rotate(${(Math.random()*10 - 5).toFixed(1)}deg)`;
+      setTimeout(() => noBtn.style.transform = "", 140);
+    }
+
+    function tooClose(clientX, clientY){
+      const nb = noBtn.getBoundingClientRect();
+      const cx = nb.left + nb.width / 2;
+      const cy = nb.top + nb.height / 2;
+      const dist = Math.hypot(clientX - cx, clientY - cy);
+      return dist < 90;
+    }
+
+    noBtn.addEventListener('mouseenter', randomHop);
+    noBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      randomHop();
+    });
+
+    arena.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      if (t && tooClose(t.clientX, t.clientY)) randomHop();
+    }, {passive:true});
+
+    arena.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      if (t && tooClose(t.clientX, t.clientY)) randomHop();
+    }, {passive:true});
+
+    arena.addEventListener('mousemove', (e) => {
+      if (tooClose(e.clientX, e.clientY)) randomHop();
+    });
+
+    function spawnHeart(){
+      const h = document.createElement('div');
+      h.className = 'heart';
+      h.textContent = ['💖','💘','💗','💝','💕'][Math.floor(Math.random()*5)];
+      h.style.left = (10 + Math.random()*80) + "%";
+      h.style.animationDuration = (1.8 + Math.random()*1.2) + "s";
+      hearts.appendChild(h);
+      requestAnimationFrame(() => h.style.opacity = "1");
+      setTimeout(() => h.remove(), 2600);
+    }
+
+    yesBtn.addEventListener('click', () => {
+      toast.style.display = 'block';
+      for(let i=0;i<12;i++) setTimeout(spawnHeart, i*90);
+      yesBtn.textContent = "JAAAA! 💞";
+      yesBtn.style.filter = "brightness(1.05)";
+      noBtn.style.filter = "grayscale(0.2) opacity(0.9)";
+      // WhatsApp öffnen (mit kleiner Verzögerung für Effekt)
+      setTimeout(openWhatsApp, 600);
+    });
+
+    window.addEventListener('resize', init);
+    init();
+  </script>
+</body>
+</html>
